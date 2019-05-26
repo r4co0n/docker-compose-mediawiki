@@ -23,9 +23,7 @@ services:
             - PROXY_RESTBASE_SUB=/{backend_hint}/v1
 
     web:
-        build: 
-            context: ./web
-            dockerfile: Dockerfile
+        build: ./web
         restart: always
         depends_on:
             - db
@@ -73,7 +71,7 @@ services:
             - PARSOID_DOMAIN_web=http://web/w/api.php
 
     restbase:
-        image: pastakhov/restbase:0.16.9
+        build: ./restbase
         restart: always
         environment:
             - RB_CONF_NUM_WORKERS=0

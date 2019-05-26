@@ -1,0 +1,4 @@
+[submodule "restbase"]
+	path = restbase
+	url = https://github.com/r4co0n/docker-mediawiki-restbase
+	branch = master
