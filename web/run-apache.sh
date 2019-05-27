@@ -50,7 +50,7 @@ wait_elasticsearch_started ()
     if [ "$i" = 0 ]; then
         echo >&2 'Could not connect to the elasticsearch'
         echo "$output"
-        retirn 1
+        return 1
     fi
     echo 'Elasticsearch started successfully'
     es_started="1"
@@ -65,7 +65,7 @@ run_maintenance_script_if_needed () {
     fi
 
     if [[ "$update_info" != "$2" && -n "$2" && "${2: -1}" != '-' ]]; then
-        wait_database_started "$MW_DB_INSTALLDB_USER" "$MW_DB_INSTALLDB_PASS"
+        wait_database_started "$MW_DB_USER" "$MW_DB_PASSWORD"
         if [[ "$1" == *CirrusSearch* ]]; then wait_elasticsearch_started; fi 
 
         i=3
@@ -95,7 +95,7 @@ run_script_if_needed () {
     fi
 
     if [[ "$update_info" != "$2" && -n "$2" && "${2: -1}" != '-' ]]; then
-        wait_database_started "$MW_DB_INSTALLDB_USER" "$MW_DB_INSTALLDB_PASS"
+        wait_database_started "$MW_DB_USER" "$MW_DB_PASSWORD"
         if [[ "$1" == *CirrusSearch* ]]; then wait_elasticsearch_started; fi 
         echo "Run script: $3"
         eval $3
@@ -117,7 +117,7 @@ cd $MW_HOME
 if [ ! -e "$MW_VOLUME/LocalSettings.php" ]; then
     echo "There is no LocalSettings.php, create one using maintenance/install.php"
 
-    for x in MW_DB_INSTALLDB_USER MW_DB_INSTALLDB_PASS
+    for x in MW_DB_USER MW_DB_PASSWORD
     do
         if [ -z "${!x}" ]; then
             echo >&2 "Variable $x must be defined";
@@ -125,17 +125,14 @@ if [ ! -e "$MW_VOLUME/LocalSettings.php" ]; then
         fi
     done
 
-    wait_database_started $MW_DB_INSTALLDB_USER $MW_DB_INSTALLDB_PASS
+    wait_database_started "$MW_DB_USER" "$MW_DB_PASSWORD"
 
     php maintenance/install.php \
         --confpath "$MW_VOLUME" \
         --dbserver "db" \
-        --dbtype "mysql" \
         --dbname "$MW_DB_NAME" \
         --dbuser "$MW_DB_USER" \
         --dbpass "$MW_DB_PASSWORD" \
-        --installdbuser "$MW_DB_INSTALLDB_USER" \
-        --installdbpass "$MW_DB_INSTALLDB_PASS" \
         --server "$MW_SITE_SERVER" \
         --scriptpath "/w" \
         --lang "$MW_SITE_LANG" \
